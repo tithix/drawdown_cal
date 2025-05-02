@@ -363,10 +363,27 @@
         padding: 0.6rem 0.5rem;
         flex-direction: column;
         gap: 0.5rem;
+        align-items: stretch;
+      }
+
+      .floating-footnote .footer-center {
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        width: 100%;
+        margin: 0 auto;
+        display: flex;
+        flex-direction: column;
       }
 
       .floating-footnote .footer-icons {
-        margin-left: 0;
+        justify-content: flex-start;
+        margin: 0 0 0.3rem 0;
+      }
+
+      .floating-footnote .footer-actions {
+        justify-content: flex-end;
+        margin: 0.3rem 0 0 0;
       }
     }
 
@@ -1328,11 +1345,13 @@
           </div>
         `;
 
-        // Réinitialiser le graphique si nécessaire
-        if (!this.chartInstance && this.state.dailyPnLs.length > 0) {
+        // Destroy and re-initialize the chart after each render
+        if (this.chartInstance) {
+          this.chartInstance.destroy();
+          this.chartInstance = null;
+        }
+        if (this.state.dailyPnLs.length > 0) {
           this.initChart();
-        } else if (this.chartInstance) {
-          this.updateChart();
         }
         this.bindEvents();
       }

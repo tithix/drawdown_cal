@@ -302,6 +302,10 @@
     }
 
     .floating-footnote {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      align-items: center;
+      justify-items: center;
       position: fixed;
       left: 0;
       right: 0;
@@ -309,83 +313,67 @@
       z-index: 100;
       background: rgba(24, 32, 54, 0.97);
       color: #64748b;
-      font-size: 0.78rem;
-      opacity: 0.7;
+      font-size: 0.74rem;
+      opacity: 0;
+      pointer-events: none;
       padding: 0.7rem 1.5rem 0.7rem 1.5rem;
-      display: flex;
-      align-items: center;
-      justify-content: center;
       gap: 0;
       box-shadow: 0 -2px 16px 0 rgba(16, 22, 36, 0.12);
       border-top: 1px solid #334155;
       letter-spacing: 0.01em;
+      transition: opacity 0.3s;
     }
 
-    .floating-footnote .footer-center {
-      flex: 1 1 0%;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      width: 100%;
-    }
-
-    .floating-footnote .footer-icons {
-      display: flex;
-      gap: 1.1rem;
-      align-items: center;
-      margin-right: 1.5rem;
-    }
-
-    .floating-footnote a {
-      color: #64748b;
-      font-size: 1.1rem;
-      opacity: 0.8;
-      transition: color 0.2s, opacity 0.2s;
-      display: inline-flex;
-      align-items: center;
-    }
-
-    .floating-footnote a:hover {
-      color: #34d399;
+    .floating-footnote.show-footnote {
       opacity: 1;
+      pointer-events: auto;
     }
 
-    .floating-footnote .footer-actions {
-      display: flex;
-      gap: 0.5rem;
-      margin-left: auto;
+    .footer-center {
+      text-align: center;
+      justify-self: center;
+      width: 100%;
+      font-size: 0.74rem;
+    }
+
+    .footer-icons {
+      justify-self: start;
+    }
+
+    .footer-icons i {
+      font-size: 1.45rem;
+      margin-right: 0.7rem;
+    }
+
+    .footer-icons i:last-child {
+      margin-right: 0;
+    }
+
+    .footer-actions {
+      justify-self: end;
     }
 
     @media (max-width: 600px) {
       .floating-footnote {
-        font-size: 0.92rem;
-        padding: 0.6rem 0.5rem;
-        flex-direction: column;
-        gap: 0.5rem;
-        align-items: stretch;
-      }
-
-      .floating-footnote .footer-center {
-        align-items: center;
-        justify-content: center;
+        grid-template-columns: 1fr;
+        grid-template-rows: auto auto auto;
         text-align: center;
-        width: 100%;
-        margin: 0 auto;
-        display: flex;
-        flex-direction: column;
+        justify-items: center;
+        align-items: center;
+        opacity: 0;
+        pointer-events: none;
       }
 
-      .floating-footnote .footer-icons {
-        justify-content: center;
-        margin: 0 auto 0.3rem auto;
-        display: flex;
+      .floating-footnote.show-footnote {
+        opacity: 0.95;
+        pointer-events: auto;
       }
 
-      .floating-footnote .footer-actions {
-        justify-content: center;
-        margin: 0.3rem auto 0 auto;
-        display: flex;
+      .footer-icons,
+      .footer-center,
+      .footer-actions {
+        justify-self: center;
+        margin: 0.2rem 0;
       }
     }
 
@@ -1363,10 +1351,31 @@
     document.addEventListener('DOMContentLoaded', () => {
       new App();
     });
+
+    // Show/hide floating footnote on hover near bottom
+    (function () {
+      const footnote = document.getElementById('floatingFootnote');
+      let isVisible = false;
+      function checkFooterVisibility(e) {
+        const y = e.clientY || (e.touches && e.touches[0].clientY);
+        const windowHeight = window.innerHeight;
+        if (windowHeight - y < 40) {
+          footnote.classList.add('show-footnote');
+          isVisible = true;
+        } else {
+          footnote.classList.remove('show-footnote');
+          isVisible = false;
+        }
+      }
+      // Always show on page load for accessibility
+      footnote.classList.add('show-footnote');
+      document.addEventListener('mousemove', checkFooterVisibility);
+      document.addEventListener('touchmove', checkFooterVisibility);
+    })();
   </script>
 
-  <div class="floating-footnote">
-    <span class="footer-icons mt-1" style="margin-right:1.5rem;">
+  <div class="floating-footnote show-footnote" id="floatingFootnote">
+    <span class="footer-icons mt-1">
       <a href="https://discord.com/" target="_blank" title="Discord"><i class="fab fa-discord"></i></a>
       <a href="https://twitter.com/" target="_blank" title="Twitter"><i class="fab fa-twitter"></i></a>
       <a href="https://youtube.com/" target="_blank" title="YouTube"><i class="fab fa-youtube"></i></a>
@@ -1375,7 +1384,7 @@
     <div class="footer-center">
       Designed by Traders, for Traders &copy; 2025 • Powered by 3dr!ves
     </div>
-    <span class="footer-actions flex gap-2 ml-auto" style="margin-left:auto;">
+    <span class="footer-actions flex gap-2">
       <input type="file" id="importDataFooter" accept="application/json" style="display:none;" />
       <button id="importDataBtnFooter"
         class="bg-slate-700 hover:bg-slate-800 text-white px-4 py-1.5 rounded-lg flex items-center text-sm border border-slate-600">
